@@ -15,7 +15,8 @@ using namespace edm;
 
 TestGenInfoProduct::TestGenInfoProduct(const edm::ParameterSet& iPSet):  
   genrunCollection_(iPSet.getParameter<edm::InputTag>("genrunCollection")),
-  genevtCollection_(iPSet.getParameter<edm::InputTag>("genevtCollection"))
+  genevtCollection_(iPSet.getParameter<edm::InputTag>("genevtCollection")),
+  runOnly_(iPSet.getUntrackedParameter<bool>("runOnly","False"))
 {    
 }
 
@@ -46,6 +47,8 @@ void TestGenInfoProduct::beginRun(const edm::Run& iRun,const edm::EventSetup& iS
 void TestGenInfoProduct::endRun(const edm::Run& iRun,const edm::EventSetup& iSetup){return;}
 void TestGenInfoProduct::analyze(const edm::Event& iEvent,const edm::EventSetup& iSetup)
 { 
+
+  if ( runOnly_ ) { return; }
 
   // Gather information on the GenEventInfoProduct collection
 

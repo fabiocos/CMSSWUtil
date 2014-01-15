@@ -42,6 +42,8 @@ class TestGenInfoProduct : public edm::EDAnalyzer
     edm::InputTag genrunCollection_;
     edm::InputTag genevtCollection_;
 
+    bool runOnly_;
+
 };
 
 #endif
