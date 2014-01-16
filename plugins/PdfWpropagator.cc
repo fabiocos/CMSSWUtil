@@ -64,13 +64,13 @@ void PdfWpropagator::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 
   std::auto_ptr<GenEventInfoProduct> modEventInfo(new GenEventInfoProduct(*genevt));
 
-  std::cout << "Before " << genevt->weights()[0] << " PDF w = " << (*weightHandle)[iSet_] << std::endl;
+  //  std::cout << "Before " << genevt->weights()[0] << " PDF w = " << (*weightHandle)[iSet_] << std::endl;
 
-  std::vector<double> tmpW(genevt->weights()); 
-  tmpW[0] *= (*weightHandle)[iSet_];
+  std::vector<double> tmpW; 
+  tmpW.push_back(genevt->weights()[0] * (*weightHandle)[iSet_]);
   modEventInfo->setWeights(tmpW);
 
-  std::cout << "After " << modEventInfo->weights()[0] << std::endl;
+  //  std::cout << "After " << modEventInfo->weights()[0] << std::endl;
 
   iEvent.put(modEventInfo);
 
