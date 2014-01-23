@@ -67,7 +67,7 @@ void PdfWpropagator::beginJob() {
 
 void PdfWpropagator::endJob() {
 
-  if ( nEvt_ = 0 ) { edm::LogWarning("NoEvent") << "No selected event for reweighting"; return; }
+  if ( nEvt_ == 0 ) { edm::LogWarning("NoEvent") << "No selected event for reweighting"; return; }
 
   double ave_orig = Sw_orig_/(double)nEvt_;
 
@@ -112,13 +112,14 @@ void PdfWpropagator::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
   Sw_rewe_ += newW;
   Sw2_rewe_ += newW*newW;
   
-  //  std::cout << "Before " << oldW << " PDF w = " << pdfW << std::endl;
+  std::cout << "Before " << oldW << " PDF w = " << pdfW << std::endl;
+  std::cout << "nEvt = " << nEvt_ << " Sw_orig = " << Sw_orig_ << " Sw_rewe = " << Sw_rewe_ << std::endl;
 
   std::vector<double> tmpW; 
   tmpW.push_back(newW);
   modEventInfo->setWeights(tmpW);
 
-  //  std::cout << "After " << modEventInfo->weights()[0] << std::endl;
+  std::cout << "After " << modEventInfo->weights()[0] << std::endl;
 
   iEvent.put(modEventInfo);
 
