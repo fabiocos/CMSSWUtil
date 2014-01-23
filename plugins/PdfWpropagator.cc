@@ -77,9 +77,9 @@ void PdfWpropagator::endJob() {
   double ratio_ave = Sw_rewe_/Sw_orig_;
   double eratio_ave = std::sqrt(Sw2_rewe_)/Sw_orig_;
 
-  edm::LogVerbatim("Normalizations") << "# events = " << nEvt_ << " <W_orig> = " << ave_orig << "\n" 
-                                     << "<W_rewe> = " << ave_rewe << " +/- " << eave_rewe << "\n"
-                                     << "ratio = " << ratio_ave << " +/- " << eratio_ave;
+  edm::LogInfo("Normalizations") << "# events = " << nEvt_ << " <W_orig> = " << ave_orig << "\n" 
+                                 << "<W_rewe> = " << ave_rewe << " +/- " << eave_rewe << "\n"
+                                 << "ratio = " << ratio_ave << " +/- " << eratio_ave;
 
 }
 
