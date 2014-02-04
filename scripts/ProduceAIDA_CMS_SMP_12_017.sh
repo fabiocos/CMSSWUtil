@@ -2,7 +2,7 @@
 
 set -x
 
-rm -f extractVJETSHistos.C aida.root CMS_SMP_12_017.aida *.dat
+rm -f extractVJETSHistos.C aida.root CMS_SMP_12_017.aida CMS_SMP_12_017.plot *.dat
 
 cat > extractVJETSHistos.C << EOF
 #include "TClass.h"
@@ -86,13 +86,14 @@ void extractVJETSHistos( TString inputfile = "input.root",
 }
 EOF
 
-#root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApproval.root","ele.root")'
-#root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApprovalMu.root","muo.root")'
-#root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApprovalCombined.root","comb.root")'
+#root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApproval.root","aida.root","NEW","ele")'
+#root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApprovalMu.root","aida.root","UPDATE","muo")'
+#root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApprovalCombined.root","aida.root","UPDATE","tot")'
 
-root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApproval.root","aida.root","NEW","ele")'
-root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApprovalMu.root","aida.root","UPDATE","muo")'
-root -l -q -b 'extractVJETSHistos.C("UnfoldingOfficialV57_3PostApprovalCombined.root","aida.root","UPDATE","tot")'
-
-root2flat -a CMS_SMP_12_017 -e aida.root
+root2flat -a CMS_SMP_12_017 -e dump_histos.root
 flat2aida -o - *.dat | sed 's/path="/path="\/REF\//' | sed 's/value="CMS/value="\/REF\/CMS/' > CMS_SMP_12_017.aida 
+
+for FILE in *.dat
+do
+    awk 'BEGIN {print ""} {print $0; if ($2 == "END" && $3 == "PLOT" ) {exit}} END {print ""}' $FILE >> CMS_SMP_12_017.plot
+done
