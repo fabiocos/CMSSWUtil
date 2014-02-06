@@ -49,66 +49,14 @@ export WORKDIR=`pwd`
 cp ${repo}/${cardinput} powheg.input
 card="$WORKDIR/powheg.input"
 
+cp ${repo}/${process}.exe .
+
 mkdir workdir
 cd workdir
 cat ${card} | sed -e "s#SEED#${seed}#g" | sed -e "s#NEVENTS#${nevt}#g" > base_powheg.input
-#cat powheg.input
-#../pwhg_main &> log_${process}_${seed}.txt
-
-#touch log_${process}_${seed}.txt
-echo ${seed} > pwgseeds.dat
-
-for i in {1..4}
-do
-
-   date
-   sed 's#parallelstage 1#parallelstage '${i}'#g' base_powheg.input  > powheg.input
-   cat powheg.input
-   
-   echo 1 | ../${process}.exe 
-
-   rm -f powheg.input
-
-done
-
-ls -lrt
-
-mv pwgevents-*.lhe pwgevents.lhe
-
-#reweighting info calculation
-sed 's#parallelstage 1#parallelstage 4#g' base_powheg.input | sed 's#\#compute_rwgt#compute_rwgt#g' > prod_powheg.input
-
-# renormalization and factorization scale
-
-for i in 2 0.5
-do
-
-   date
-   sed 's#facscfact 1#facscfact '${i}'#g' prod_powheg.input | sed 's#renscfact 1#renscfact '${i}'#g' > powheg.input
-   cat powheg.input
-   
-   echo 1 | ../${process}.exe 
-
-   rm -f powheg.input
-   mv pwgevents-*.lhe pwgevents.lhe
-
-done 
-
-# PDF variation
-
-for i in 21100 192800
-do
-
-   date
-   sed 's#lhans1 10800#lhans1 '${i}'#g' prod_powheg.input | sed 's#lhans2 10800#lhans2 '${i}'#g' > powheg.input
-   cat powheg.input
-   
-   echo 1 | ../${process}.exe 
-
-   rm -f powheg.input
-   mv pwgevents-*.lhe pwgevents.lhe
-
-done 
+mv base_powheg.input powheg.input
+cat powheg.input
+time ../${process}.exe &> log_${process}_${seed}.txt
 
 #remove the spurious random seed output that is non LHE standard 
 cat pwgevents.lhe | grep -v "Random number generator exit values" > ${file}_final.lhe
@@ -118,6 +66,6 @@ cp ${file}_final.lhe ${WORKDIR}/.
 #cp ${file}_final.lhe ${WORKDIR}/${file}_final.lhe
 #cp ${file}_final.lhe ${WORKDIR}/output.lhe
 
-#echo "Output ready with log_${process}_${seed}.txt and ${file}_final.lhe at `pwd` and $WORKDIR"
+echo "Output ready with log_${process}_${seed}.txt and ${file}_final.lhe at `pwd` and $WORKDIR"
 echo "End of job on " `date`
 exit 0;
