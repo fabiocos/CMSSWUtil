@@ -49,10 +49,23 @@ export WORKDIR=`pwd`
 cp ${repo}/${cardinput} powheg.input
 card="$WORKDIR/powheg.input"
 
+dat1=`echo ${cardinput} | sed 's/-powheg.input/-pwggrid.dat/' `
+dat2=`echo ${cardinput} | sed 's/-powheg.input/-pwgxgrid.dat/' ` 
+dat3=`echo ${cardinput} | sed 's/-powheg.input/-pwgubound.dat/' ` 
+
+if [ -e ${repo}/${dat1} ]; then cp ${repo}/${dat1} pwggrid.dat ; fi
+if [ -e ${repo}/${dat2} ]; then cp ${repo}/${dat2} pwgxgrid.dat ; fi
+if [ -e ${repo}/${dat3} ]; then cp ${repo}/${dat3} pwgubound.dat ; fi
+
 cp ${repo}/${process}.exe .
 
 mkdir workdir
 cd workdir
+
+ln -s ../pwggrid.dat .
+ln -s ../pwgxgrid.dat .
+ln -s ../pwguboubound.dat .
+
 cat ${card} | sed -e "s#SEED#${seed}#g" | sed -e "s#NEVENTS#${nevt}#g" > base_powheg.input
 mv base_powheg.input powheg.input
 cat powheg.input
