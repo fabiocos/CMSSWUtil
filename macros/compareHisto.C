@@ -10,7 +10,7 @@
 #include "TText.h"
 #include "TLegend.h"
 
-void compareMulti( Int_t fileMax = 4,
+void compareHisto( Int_t fileMax = 4,
                    TString file1 = "one.root", TString title1 = "run 202299 all",
                    TString file2 = "two.root", TString title2 = "run 198603 all",
                    TString file3 = "three.root", TString title3 = "MC std Summer12 PU",

@@ -80,76 +80,71 @@ chmod +x lhapdf-config
 #svn checkout --username anonymous --password anonymous svn://powhegbox.mib.infn.it/trunk/POWHEG-BOX
 # # retrieve the wanted POWHEG-BOX from the official repository 
 
-wget --no-check-certificate http://cms-project-generators.web.cern.ch/cms-project-generators/${repo}/${name}.tar.gz  -O ${name}.tar.gz
-#cp ${repo}/${name}.tar.gz ${name}.tar.gz
+#wget --no-check-certificate http://cms-project-generators.web.cern.ch/cms-project-generators/${repo}/${name}.tar.gz  -O ${name}.tar.gz
+cp ${repo}/${name}.tar.gz ${name}.tar.gz
 tar xzf ${name}.tar.gz
 
-cat > powheg-box.patch <<EOF
-diff -Naur POWHEG-BOX.orig/Version-pre2-1/cernroutines.f POWHEG-BOX/Version-pre2-1/cernroutines.f
---- POWHEG-BOX.orig/Version-pre2-1/cernroutines.f	2013-10-03 16:01:59.000000000 +0200
-+++ POWHEG-BOX/Version-pre2-1/cernroutines.f	2013-10-03 16:30:29.000000000 +0200
-@@ -793,26 +793,26 @@
- 
- 
- 
--c# 10 "lenocc.F" 2
--      FUNCTION LENOCC (CHV)
--C
--C CERN PROGLIB# M507    LENOCC          .VERSION KERNFOR  4.21  890323
--C ORIG. March 85, A.Petrilli, re-write 21/02/89, JZ
--C
--C-    Find last non-blank character in CHV
--
--      CHARACTER    CHV*(*)
--
--      N = LEN(CHV)
--
--      DO 17  JJ= N,1,-1
--      IF (CHV(JJ:JJ).NE.' ') GO TO 99
--   17 CONTINUE
--      JJ = 0
--
--   99 LENOCC = JJ
--      RETURN
--      END
-+C c# 10 "lenocc.F" 2
-+C       FUNCTION LENOCC (CHV)
-+C C
-+C C CERN PROGLIB# M507    LENOCC          .VERSION KERNFOR  4.21  890323
-+C C ORIG. March 85, A.Petrilli, re-write 21/02/89, JZ
-+C C
-+C C-    Find last non-blank character in CHV
-+
-+C       CHARACTER    CHV*(*)
-+
-+C       N = LEN(CHV)
-+
-+C       DO 17  JJ= N,1,-1
-+C       IF (CHV(JJ:JJ).NE.' ') GO TO 99
-+C    17 CONTINUE
-+C       JJ = 0
-+
-+C    99 LENOCC = JJ
-+C       RETURN
-+C       END
- c# 1 "mtlset.F"
- c# 1 "<built-in>"
- c# 1 "<command line>"
-diff -Naur POWHEG-BOX.orig/Version-pre2-1/include/pwhg_par.h POWHEG-BOX/Version-pre2-1/include/pwhg_par.h
---- POWHEG-BOX.orig/Version-pre2-1/include/pwhg_par.h	2013-10-03 16:01:58.000000000 +0200
-+++ POWHEG-BOX/Version-pre2-1/include/pwhg_par.h	2013-10-03 16:31:12.000000000 +0200
-@@ -2,7 +2,7 @@
-       real * 8 par_csicut
-       parameter (par_csicut=1)
-       integer par_maxseeds,par_maxxgriditerations
--      parameter (par_maxseeds=200,par_maxxgriditerations=10)
-+      parameter (par_maxseeds=100000,par_maxxgriditerations=10)
-       
-       real * 8 par_diexp,par_dijexp,par_2gsupp,
-      1         par_fsrtinycsi,par_fsrtinyy,
-EOF
+#remove from Powheg the LENOCC function which is already defined in LHAPDF library
+patch POWHEG-BOX/cernroutines.f <<EOF
+*** POWHEG-BOX/cernroutines_orig.f	Wed Mar 14 11:48:14 2012
+--- POWHEG-BOX/cernroutines.f	Wed Mar 14 11:48:29 2012
+***************
+*** 790,815 ****
+  
+  
+  
+! c# 10 "lenocc.F" 2
+!       FUNCTION LENOCC (CHV)
+! C
+! C CERN PROGLIB# M507    LENOCC          .VERSION KERNFOR  4.21  890323
+! C ORIG. March 85, A.Petrilli, re-write 21/02/89, JZ
+! C
+! C-    Find last non-blank character in CHV
+! 
+!       CHARACTER    CHV*(*)
+! 
+!       N = LEN(CHV)
+! 
+!       DO 17  JJ= N,1,-1
+!       IF (CHV(JJ:JJ).NE.' ') GO TO 99
+!    17 CONTINUE
+!       JJ = 0
+! 
+!    99 LENOCC = JJ
+!       RETURN
+!       END
+  c# 1 "mtlset.F"
+  c# 1 "<built-in>"
+  c# 1 "<command line>"
+--- 790,815 ----
+  
+  
+  
+! ccccccc# 10 "lenocc.F" 2
+! cccccc      FUNCTION LENOCC (CHV)
+! ccccccC
+! ccccccC CERN PROGLIB# M507    LENOCC          .VERSION KERNFOR  4.21  890323
+! ccccccC ORIG. March 85, A.Petrilli, re-write 21/02/89, JZ
+! ccccccC
+! ccccccC-    Find last non-blank character in CHV
+! cccccc
+! cccccc      CHARACTER    CHV*(*)
+! cccccc
+! cccccc      N = LEN(CHV)
+! cccccc
+! cccccc      DO 17  JJ= N,1,-1
+! cccccc      IF (CHV(JJ:JJ).NE.' ') GO TO 99
+! cccccc   17 CONTINUE
+! cccccc      JJ = 0
+! cccccc
+! cccccc   99 LENOCC = JJ
+! cccccc      RETURN
+! cccccc      END
+  c# 1 "mtlset.F"
+  c# 1 "<built-in>"
+  c# 1 "<command line>"
 
-patch -p0 < powheg-box.patch
+EOF
 
 cd POWHEG-BOX/${process}
 
@@ -176,28 +171,9 @@ chmod a+x lhapdf-config-wrap
 make LHAPDF_CONFIG="`pwd`/lhapdf-config-wrap" pwhg_main
 mkdir workdir
 cd workdir
-cat ${card} | sed -e "s#SEED#${seed}#g" | sed -e "s#NEVENTS#${nevt}#g" > base_powheg.input
-#cat powheg.input
-#../pwhg_main &> log_${process}_${seed}.txt
-
-#touch log_${process}_${seed}.txt
-seq 1 ${seed} > pwgseeds.dat
-
-for i in {1..4}
-do
-
-   date
-   sed 's#parallelstage 1#parallelstage '${i}'#g' base_powheg.input  > powheg.input
-   cat powheg.input
-   
-   echo ${rnum} | ../pwhg_main 
-
-   rm -f powheg.input
-
-done
-
-mv pwgevents*lhe pwgevents.lhe
-
+cat ${card} | sed -e "s#SEED#${seed}#g" | sed -e "s#NEVENTS#${nevt}#g" > powheg.input
+cat powheg.input
+../pwhg_main &> log_${process}_${seed}.txt
 #remove the spurious random seed output that is non LHE standard 
 cat pwgevents.lhe | grep -v "Random number generator exit values" > ${file}_final.lhe
 ls -l ${file}_final.lhe
