@@ -21,6 +21,7 @@ void compareHisto( Int_t fileMax = 4,
                    bool printStat = true, TString drawOption = "E1", bool logX = false, bool logY = false, bool logZ = false, 
                    Double_t minX=0., Double_t maxX=0., Double_t minY=0., Double_t maxY=0., 
                    bool Normalize = false, bool Scale = false, Double_t scale1 = 1., Double_t scale2 = 1., Double_t scale3 = 1., Double_t scale4 = 1.,
+                   bool ratio = false,bool fitratio = false,
                    TString legendP = "BR" ) 
 {
 
@@ -122,98 +123,191 @@ void compareHisto( Int_t fileMax = 4,
   
   Double_t scala;
 
-  if ( myHisto1) { 
-    if ( Normalize ) { myHisto1->Sumw2(); (scale1 < 0.) ? (scala = std::fabs(scale1)) : (scala = myHisto1->Integral(-1,-2,"")/scale1) ; 
-      TH1 * tcopy1 = myHisto1->DrawNormalized(drawOption, scala); }
-    else if ( Scale) { myHisto1->Sumw2(); myHisto1->Scale(std::fabs(scale1),""); 
-      if ( minX != maxX && myHisto1 ) {
-        TAxis *xaxis = myHisto1->GetXaxis();
+  if ( !ratio ) {
+
+    if ( myHisto1) { 
+      if ( Normalize ) { myHisto1->Sumw2(); (scale1 < 0.) ? (scala = std::fabs(scale1)) : (scala = myHisto1->Integral(-1,-2,"")/scale1) ; 
+        TH1 * tcopy1 = myHisto1->DrawNormalized(drawOption, scala); }
+      else if ( Scale) { myHisto1->Sumw2(); myHisto1->Scale(std::fabs(scale1),""); 
+        if ( minX != maxX && myHisto1 ) {
+          TAxis *xaxis = myHisto1->GetXaxis();
+          xaxis->SetRangeUser(minX,maxX);
+        }
+        if ( minY != maxY && myHisto1 ) {
+          TAxis *yaxis = myHisto1->GetYaxis();
+          yaxis->SetRangeUser(minY,maxY);
+        }
+        myHisto1->Draw(drawOption); 
+      } 
+      else { myHisto1->Draw(drawOption); } 
+      gPad->Update();
+      if ( printStat ) {
+        if ( !Normalize ) {
+          TPaveStats *s = (TPaveStats*)myHisto1->FindObject("stats"); }
+        else { TPaveStats *s = (TPaveStats*)tcopy1->FindObject("stats"); }
+        Double_t y1 = 1.;
+        Double_t y2 = 0.85;
+        s->SetY1NDC(y1);
+        s->SetY2NDC(y2);
+        s->SetTextColor(color1);
+      }
+    } else {
+      std::cout << "Null pointer!" << std::endl;
+    } 
+    
+    TString ndrawOption = drawOption + "sames";
+    
+    if ( myHisto2 ) { 
+      if ( Normalize ) { myHisto2->Sumw2(); (scale2 < 0.) ? (scala = std::fabs(scale2)) : (scala = myHisto2->Integral(-1,-2,"")/scale2) ; 
+        TH1 * tcopy2 = myHisto2->DrawNormalized(ndrawOption, scala); }
+      else if ( Scale) { myHisto2->Sumw2(); myHisto2->Scale(std::fabs(scale2),""); myHisto2->Draw(ndrawOption); } 
+      else { myHisto2->Draw(ndrawOption); } 
+      gPad->Update();
+      if ( printStat ) {
+        if ( !Normalize ) {
+          TPaveStats *s = (TPaveStats*)myHisto2->FindObject("stats"); }
+        else { TPaveStats *s = (TPaveStats*)tcopy2->FindObject("stats"); }
+        Double_t y1 = 0.7;
+        Double_t y2 = 0.85;
+        s->SetY1NDC(y1);
+        s->SetY2NDC(y2); 
+        s->SetTextColor(color2);
+      }
+    } else {
+      std::cout << "Null pointer!" << std::endl;
+    }
+    if ( fileMax > 2 ) {
+      if ( myHisto3 ) { 
+        if ( Normalize ) { myHisto3->Sumw2(); (scale3 < 0.) ? (scala = std::fabs(scale3)) : (scala = myHisto3->Integral(-1,-2,"")/scale3) ; 
+          TH1 * tcopy3 = myHisto3->DrawNormalized(ndrawOption, scala); }
+        else if ( Scale) { myHisto3->Sumw2(); myHisto3->Scale(std::fabs(scale3),""); myHisto3->Draw(ndrawOption); } 
+        else { myHisto3->Draw(ndrawOption); } 
+        gPad->Update();
+        if ( printStat ) {
+          if ( !Normalize ) {
+            TPaveStats *s = (TPaveStats*)myHisto3->FindObject("stats"); }
+          else { TPaveStats *s = (TPaveStats*)tcopy3->FindObject("stats"); }
+          Double_t y1 = 0.55;
+          Double_t y2 = 0.7;
+          s->SetY1NDC(y1);
+          s->SetY2NDC(y2);
+          s->SetTextColor(color3);
+        }
+      } else {
+        std::cout << "Null pointer!" << std::endl;
+      }
+    }
+    if ( fileMax > 3 ) {
+      if ( myHisto4 ) { 
+        if ( Normalize ) { myHisto4->Sumw2(); (scale4 < 0.) ? (scala = std::fabs(scale4)) : (scala = myHisto4->Integral(-1,-2,"")/scale4) ; 
+          TH1 * tcopy4 = myHisto4->DrawNormalized(ndrawOption, scala); }
+        else if ( Scale) { myHisto4->Sumw2(); myHisto4->Scale(std::fabs(scale4),""); myHisto4->Draw(ndrawOption); } 
+        else { myHisto4->Draw(ndrawOption); } 
+        gPad->Update();
+        if ( printStat ) {
+          if ( !Normalize ) {
+            TPaveStats *s = (TPaveStats*)myHisto4->FindObject("stats"); }
+          else { TPaveStats *s = (TPaveStats*)tcopy4->FindObject("stats"); } 
+          Double_t y1 = 0.4;
+          Double_t y2 = 0.55;
+          s->SetY1NDC(y1);
+          s->SetY2NDC(y2);
+          s->SetTextColor(color4);
+        }
+      } else {
+        std::cout << "Null pointer!" << std::endl;
+      }
+    }
+    
+  } else {
+    
+    if ( myHisto1 && myHisto2 ) {
+      myHisto1->Sumw2();
+      myHisto2->Sumw2();
+      TH1 * myRatio1 = myHisto1;
+      myRatio1->Divide(myRatio1,myHisto2,scale1,scale2," ");
+      if ( fitratio ) {
+        myRatio1->Fit("pol1");
+        if (printStat) {
+          myRatio1->SetStats(kTRUE);
+          gStyle->SetOptFit(1); }
+      }
+  
+      myRatio1->SetLineColor(color2);
+      myRatio1->SetMarkerStyle(marker2);
+      myRatio1->SetMarkerSize(markerSize);
+      myRatio1->SetMarkerColor(color2);
+
+      if ( minX != maxX ) {
+        TAxis *xaxis = myRatio1->GetXaxis();
         xaxis->SetRangeUser(minX,maxX);
       }
-      if ( minY != maxY && myHisto1 ) {
-        TAxis *yaxis = myHisto1->GetYaxis();
+      if ( minY != maxY ) {
+        TAxis *yaxis = myRatio1->GetYaxis();
         yaxis->SetRangeUser(minY,maxY);
       }
-      myHisto1->Draw(drawOption); 
-    } 
-    else { myHisto1->Draw(drawOption); } 
-    gPad->Update();
-    if ( printStat ) {
-      if ( !Normalize ) {
-        TPaveStats *s = (TPaveStats*)myHisto1->FindObject("stats"); }
-      else { TPaveStats *s = (TPaveStats*)tcopy1->FindObject("stats"); }
-      Double_t y1 = 1.;
-      Double_t y2 = 0.85;
-      s->SetY1NDC(y1);
-      s->SetY2NDC(y2);
-      s->SetTextColor(color1);
+      myRatio1->Draw(drawOption);
     }
-  } else {
-    std::cout << "Null pointer!" << std::endl;
-  } 
 
-  TString ndrawOption = drawOption + "sames";
+    TString ndrawOption = drawOption + "sames";
+    
+    if ( fileMax > 2 ) {
+      if ( myHisto3 ) { 
+        myHisto3->Sumw2();
+        TH1 * myRatio2 = myHisto1;
+        myRatio2->Divide(myRatio2,myHisto3,scale1,scale3," ");
   
-  if ( myHisto2 ) { 
-    if ( Normalize ) { myHisto2->Sumw2(); (scale2 < 0.) ? (scala = std::fabs(scale2)) : (scala = myHisto2->Integral(-1,-2,"")/scale2) ; 
-      TH1 * tcopy2 = myHisto2->DrawNormalized(ndrawOption, scala); }
-    else if ( Scale) { myHisto2->Sumw2(); myHisto2->Scale(std::fabs(scale2),""); myHisto2->Draw(ndrawOption); } 
-    else { myHisto2->Draw(ndrawOption); } 
-    gPad->Update();
-    if ( printStat ) {
-      if ( !Normalize ) {
-        TPaveStats *s = (TPaveStats*)myHisto2->FindObject("stats"); }
-      else { TPaveStats *s = (TPaveStats*)tcopy2->FindObject("stats"); }
-      Double_t y1 = 0.7;
-      Double_t y2 = 0.85;
-      s->SetY1NDC(y1);
-      s->SetY2NDC(y2); 
-      s->SetTextColor(color2);
-    }
-  } else {
-    std::cout << "Null pointer!" << std::endl;
-  }
-  if ( fileMax > 2 ) {
-    if ( myHisto3 ) { 
-      if ( Normalize ) { myHisto3->Sumw2(); (scale3 < 0.) ? (scala = std::fabs(scale3)) : (scala = myHisto3->Integral(-1,-2,"")/scale3) ; 
-        TH1 * tcopy3 = myHisto3->DrawNormalized(ndrawOption, scala); }
-      else if ( Scale) { myHisto3->Sumw2(); myHisto3->Scale(std::fabs(scale3),""); myHisto3->Draw(ndrawOption); } 
-      else { myHisto3->Draw(ndrawOption); } 
-      gPad->Update();
-      if ( printStat ) {
-        if ( !Normalize ) {
-          TPaveStats *s = (TPaveStats*)myHisto3->FindObject("stats"); }
-        else { TPaveStats *s = (TPaveStats*)tcopy3->FindObject("stats"); }
-        Double_t y1 = 0.55;
-        Double_t y2 = 0.7;
-        s->SetY1NDC(y1);
-        s->SetY2NDC(y2);
-        s->SetTextColor(color3);
+        myRatio2->SetLineColor(color3);
+        myRatio2->SetMarkerStyle(marker3);
+        myRatio2->SetMarkerSize(markerSize);
+        myRatio2->SetMarkerColor(color3);
+
+        if ( minX != maxX ) {
+          TAxis *xaxis = myRatio2->GetXaxis();
+          xaxis->SetRangeUser(minX,maxX);
+        }
+        if ( minY != maxY ) {
+          TAxis *yaxis = myRatio2->GetYaxis();
+          yaxis->SetRangeUser(minY,maxY);
+        }
+        myRatio2->Draw(ndrawOption);
+        if ( fitratio ) {
+          myRatio2->Fit("pol1");
+          if (printStat) {
+            myRatio2->SetStats(kTRUE);
+            gStyle->SetOptFit(1); }
+        }
       }
-    } else {
-      std::cout << "Null pointer!" << std::endl;
     }
-  }
-  if ( fileMax > 3 ) {
-    if ( myHisto4 ) { 
-      if ( Normalize ) { myHisto4->Sumw2(); (scale4 < 0.) ? (scala = std::fabs(scale4)) : (scala = myHisto4->Integral(-1,-2,"")/scale4) ; 
-        TH1 * tcopy4 = myHisto4->DrawNormalized(ndrawOption, scala); }
-      else if ( Scale) { myHisto4->Sumw2(); myHisto4->Scale(std::fabs(scale4),""); myHisto4->Draw(ndrawOption); } 
-      else { myHisto4->Draw(ndrawOption); } 
-      gPad->Update();
-      if ( printStat ) {
-        if ( !Normalize ) {
-          TPaveStats *s = (TPaveStats*)myHisto4->FindObject("stats"); }
-        else { TPaveStats *s = (TPaveStats*)tcopy4->FindObject("stats"); } 
-        Double_t y1 = 0.4;
-        Double_t y2 = 0.55;
-        s->SetY1NDC(y1);
-        s->SetY2NDC(y2);
-        s->SetTextColor(color4);
+    if ( fileMax > 3 ) {
+      if ( myHisto4 ) { 
+        myHisto4->Sumw2();
+        TH1 * myRatio3 = myHisto1;
+        myRatio3->Divide(myRatio3,myHisto4,scale1,scale4," ");
+  
+        myRatio3->SetLineColor(color4);
+        myRatio3->SetMarkerStyle(marker4);
+        myRatio3->SetMarkerSize(markerSize);
+        myRatio3->SetMarkerColor(color4);
+
+        if ( minX != maxX ) {
+          TAxis *xaxis = myRatio3->GetXaxis();
+          xaxis->SetRangeUser(minX,maxX);
+        }
+        if ( minY != maxY ) {
+          TAxis *yaxis = myRatio3->GetYaxis();
+          yaxis->SetRangeUser(minY,maxY);
+        }
+        myRatio3->Draw(ndrawOption);
+        if ( fitratio ) {
+          myRatio3->Fit("pol1");
+          if (printStat) {
+            myRatio3->SetStats(kTRUE);
+            gStyle->SetOptFit(1); }
+        }
       }
-    } else {
-      std::cout << "Null pointer!" << std::endl;
     }
+
   }
 
   //  TPaveText *pt = new TPaveText(.1,.3,.4,.1,"NDC");

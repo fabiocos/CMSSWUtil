@@ -16,27 +16,29 @@
 #include "FWCore/Framework/interface/EDFilter.h"
 
 #include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
+//#include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/EDGetToken.h"
 
-
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 //
 // class decleration
 //
 
 class LHEZdecayFilter : public edm::EDFilter {
    public:
-      explicit LHEZdecayFilter(const edm::ParameterSet&);
-      ~LHEZdecayFilter();
-
+  explicit LHEZdecayFilter(const edm::ParameterSet&);
+  ~LHEZdecayFilter();
+  
 
       virtual bool filter(edm::Event&, const edm::EventSetup&);
    private:
       // ----------member data ---------------------------
       
       edm::InputTag src_;
+      edm::EDGetTokenT<LHEEventProduct> lheEventToken_;
       int leptonID_;
       bool verbose_;
 };

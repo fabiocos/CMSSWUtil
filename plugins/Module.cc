@@ -2,7 +2,10 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "LHEZdecayFilter.h"
-DEFINE_FWK_MODULE (LHEZdecayFilter);
+DEFINE_FWK_MODULE(LHEZdecayFilter);
+
+#include "TestEventTime.h"
+DEFINE_FWK_MODULE (TestEventTime);
 
 #include "TestLHE.h"
 DEFINE_FWK_MODULE (TestLHE);

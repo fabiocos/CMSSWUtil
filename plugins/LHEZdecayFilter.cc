@@ -1,7 +1,6 @@
 
 #include "LHEZdecayFilter.h"
 
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include <iostream>
 
 using namespace edm;
@@ -9,7 +8,7 @@ using namespace std;
 
 
 LHEZdecayFilter::LHEZdecayFilter(const edm::ParameterSet& iConfig) :
-  src_(iConfig.getParameter<InputTag>( "src" ) ),
+  lheEventToken_(consumes<LHEEventProduct>(iConfig.getParameter<InputTag>( "src" ))),
   leptonID_(iConfig.getParameter<int>( "leptonID" ) ),
   verbose_(iConfig.getUntrackedParameter<bool>( "verbose","False" ) )
 {
@@ -37,7 +36,7 @@ bool LHEZdecayFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    bool accepted = false;
 
    Handle<LHEEventProduct> evt;
-   iEvent.getByLabel( src_, evt );
+   iEvent.getByToken( lheEventToken_, evt );
 
    const lhef::HEPEUP hepeup_ = evt->hepeup();
 

@@ -7,6 +7,7 @@
  */
  
 #include "TestHepMC.h"
+#include <iomanip>
 
 #include "CLHEP/Units/defs.h"
 #include "CLHEP/Units/PhysicalConstants.h"
