@@ -7,7 +7,8 @@ do
 
   echo $FILE
   ln -sf $FILE gen.root
-  cmsRun runTestGenInfoProduct_cfg.py >> xsec
+  cmsExec.sh runTestGenInfoProduct_cfg.py >> xsec
+  if [ $? != 0 ]; then echo "Problems in" $FILE ; fi 
 
 done
 
