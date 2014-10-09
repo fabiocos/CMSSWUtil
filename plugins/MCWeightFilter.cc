@@ -3,6 +3,7 @@
 
 // system include files
 #include <memory>
+#include <iomanip>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
