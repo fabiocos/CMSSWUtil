@@ -7,6 +7,7 @@
  */
  
 #include "TestGenInfoProduct.h"
+#include <iostream>
 #include <iomanip>
 
 //#include "CLHEP/Units/defs.h"
