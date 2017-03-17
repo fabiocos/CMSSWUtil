@@ -1,11 +1,11 @@
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
+#include "LHEZdecayFilter.h"
+DEFINE_FWK_MODULE(LHEZdecayFilter);
+
 #include "TestEventTime.h"
 DEFINE_FWK_MODULE (TestEventTime);
-
-#include "LHEZdecayFilter.h"
-DEFINE_FWK_MODULE (LHEZdecayFilter);
 
 #include "TestLHE.h"
 DEFINE_FWK_MODULE (TestLHE);
