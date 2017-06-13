@@ -4,6 +4,9 @@
 #include "TestEventTime.h"
 DEFINE_FWK_MODULE (TestEventTime);
 
+#include "LHEhfFromPSMPIFilter.h"
+DEFINE_FWK_MODULE (LHEhfFromPSMPIFilter);
+
 #include "LHEZdecayFilter.h"
 DEFINE_FWK_MODULE (LHEZdecayFilter);
 
