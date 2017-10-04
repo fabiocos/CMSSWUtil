@@ -1,11 +1,16 @@
 // PDF weight propagator, needed to transmit PDF weights to Rivet CMSSW interface
+// system include files
+#include <memory>
 
-// framework & common header files
-#include "FWCore/Framework/interface/EDProducer.h"
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/stream/EDProducer.h"
+
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/StreamID.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
@@ -16,20 +21,22 @@
 
 #include <vector>
 
-class PdfWpropagator : public edm::EDProducer
+class PdfWpropagator : public edm::stream::EDProducer<>
 {
 public:
   explicit PdfWpropagator(const edm::ParameterSet&);
   virtual ~PdfWpropagator();
-  virtual void beginJob() ;
-  virtual void endJob() ;
-  virtual void produce(edm::Event&, const edm::EventSetup&);
   
 private:
+  virtual void beginStream(edm::StreamID) override;
+  virtual void produce(edm::Event&, const edm::EventSetup&) override;
+  virtual void endStream(edm::StreamID);
   
-  edm::InputTag genevtCollection_;
-  edm::InputTag pdfWCollection_;
-
+  //  edm::InputTag genevtCollection_;
+  //  edm::InputTag pdfWCollection_;
+  edm::EDGetTokenT<GenEventInfoProduct> genevtCollection_;
+  edm::EDGetTokenT<std::vector<double>> pdfWCollection_;
+  
   unsigned int iSet_;
 
   unsigned int nEvt_;
@@ -44,10 +51,13 @@ private:
 using namespace edm;
 
 PdfWpropagator::PdfWpropagator(const edm::ParameterSet& iPSet):  
-  genevtCollection_(iPSet.getParameter<edm::InputTag>("genevtCollection")),
-  pdfWCollection_(iPSet.getParameter<edm::InputTag>("pdfWCollection")),
+  //  genevtCollection_(iPSet.getParameter<edm::InputTag>("genevtCollection")),
+  //  pdfWCollection_(iPSet.getParameter<edm::InputTag>("pdfWCollection")),
   iSet_(iPSet.getParameter<unsigned int>("iSet"))
 {    
+
+  genevtCollection_ = consumes<GenEventInfoProduct>(iPSet.getParameter<edm::InputTag>("genevtCollection"));
+  pdfWCollection_ = consumes<std::vector<double>>(iPSet.getParameter<edm::InputTag>("pdfWCollection"));
 
   produces<GenEventInfoProduct>();
 
@@ -55,7 +65,7 @@ PdfWpropagator::PdfWpropagator(const edm::ParameterSet& iPSet):
 
 PdfWpropagator::~PdfWpropagator() {}
 
-void PdfWpropagator::beginJob() {
+void PdfWpropagator::beginStream(edm::StreamID) {
 
   nEvt_ = 0;
   Sw_orig_ = 0.;
@@ -65,7 +75,7 @@ void PdfWpropagator::beginJob() {
 
 }
 
-void PdfWpropagator::endJob() {
+void PdfWpropagator::endStream(edm::StreamID) {
 
   if ( nEvt_ == 0 ) { edm::LogWarning("NoEvent") << "No selected event for reweighting"; return; }
 
@@ -87,10 +97,10 @@ void PdfWpropagator::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 { 
 
   edm::Handle<GenEventInfoProduct> genevt;
-  iEvent.getByLabel(genevtCollection_, genevt );
+  iEvent.getByToken(genevtCollection_, genevt );
 
   edm::Handle<std::vector<double> > weightHandle;
-  iEvent.getByLabel(pdfWCollection_, weightHandle );
+  iEvent.getByToken(pdfWCollection_, weightHandle );
 
   if ( weightHandle->size() < iSet_ ) {
     throw cms::Exception("MissingWeights") << "The requested weight cannot be found in the corresponding array";
@@ -98,7 +108,7 @@ void PdfWpropagator::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 
   // recompute the new event weight overwriting the original one
 
-  std::auto_ptr<GenEventInfoProduct> modEventInfo(new GenEventInfoProduct(*genevt));
+  std::unique_ptr<GenEventInfoProduct> modEventInfo(new GenEventInfoProduct(*genevt));
   
   nEvt_++;
 
@@ -121,7 +131,7 @@ void PdfWpropagator::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 
   //  std::cout << "After " << modEventInfo->weights()[0] << std::endl;
 
-  iEvent.put(modEventInfo);
+  iEvent.put(std::move(modEventInfo));
 
 }
 
