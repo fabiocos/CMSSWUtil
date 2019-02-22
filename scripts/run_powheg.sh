@@ -78,4 +78,3 @@ cp ${file}_final.lhe ${WORKDIR}/.
 echo "Output ready with log_${process}_${seed}.txt and ${file}_final.lhe at `pwd` and $WORKDIR"
 echo "End of job on " `date`
 exit 0;
-
