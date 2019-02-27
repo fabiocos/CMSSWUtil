@@ -1,3 +1,5 @@
+<! -- Before you submit a PR please check the [Contributing Guidelines](CONTRIBUTING.md) >
+
 #### PR description:
 
 <! -- Please include here a description of the feature proposed or problem addressed, what changes are expected in the output if any, what other PRs or externals it depends upon if any >
