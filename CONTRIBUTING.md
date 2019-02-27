@@ -1,8 +1,6 @@
-# Contributing guidelines
+#### Contributing guidelines
 
-## Pull Request Checklist
-
-Before sending your pull requests, make sure you followed this list.
+Before submitting your pull requests, make sure you followed this checklist.
 
 - verify that the PR is really indended for the chosen branch
 - verify that changes follow [CMS Naming, Coding, And Style Rules](http://cms-sw.github.io/cms_coding_rules.html)
