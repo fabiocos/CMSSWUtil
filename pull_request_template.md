@@ -1,5 +1,3 @@
-<!-- Before you submit a PR please check the [Contributing Guidelines](CONTRIBUTING.md) -->
-
 #### PR description:
 
 <!-- Please replace this text with a description of the feature proposed or problem addressed, what changes are expected in the output if any, what other PRs or externals it depends upon if any -->
@@ -10,3 +8,8 @@
 
 ##### - if this PR is a backport please specify the original PR:
 
+Before submitting your pull requests, make sure you followed this checklist:
+
+- verify that the PR is really indended for the chosen branch
+- verify that changes follow [CMS Naming, Coding, And Style Rules](http://cms-sw.github.io/cms_coding_rules.html)
+- verify that the PR passes the basic test procedure suggested in the [CMSSW PR instructions](https://cms-sw.github.io/PRWorkflow.html)
