@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-
+#Test comment
 MCWeightFilter = cms.EDFilter("MCWeightFilter",
     src = cms.InputTag("generator"),
     WeightMin = cms.double(-1e9),                          
