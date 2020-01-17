@@ -1,5 +1,5 @@
 
-void plot() {
+void HistoTableDiffe() {
 
    const int mpt = 9999;
    //float x1[mpt];
@@ -35,7 +35,6 @@ void plot() {
    npt = 0;
 
    // read data file
-   ifstream in;
    in.open("new");
 
    while ( kTRUE ) {
@@ -65,7 +64,7 @@ void plot() {
      //cout << "i = " << icount << " diffe = " << diffe[icount] << endl;
    }
 
-   TCanvas* c1 = new TCanvas("c1", "c1",x2[icount] 0, 0, 500, 500);
+   TCanvas* c1 = new TCanvas("c1", "c1", 0, 0, 500, 500);
 
    vector<float>::const_iterator imin = min_element(diffe.begin(),diffe.end());
    float amin = (*imin)*0.9;
@@ -90,4 +89,3 @@ void plot() {
    c1->Print("plot.jpg");
 
 }
-
