@@ -36,6 +36,3 @@ DEFINE_FWK_MODULE (TestPDF);
 
 #include "TestGenInfoProduct.h"
 DEFINE_FWK_MODULE (TestGenInfoProduct);
-
-#include "MonitorMixCollection.h"
-DEFINE_FWK_MODULE (MonitorMixCollection); 

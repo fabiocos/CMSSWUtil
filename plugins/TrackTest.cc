@@ -38,10 +38,7 @@ Implementation:
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "TrackingTools/Records/interface/TransientRecHitRecord.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHitBuilder.h"
-#include "DataFormats/SiStripDetId/interface/TIBDetId.h"
-#include "DataFormats/SiStripDetId/interface/TOBDetId.h"
-#include "DataFormats/SiStripDetId/interface/TIDDetId.h"
-#include "DataFormats/SiStripDetId/interface/TECDetId.h"
+#include "DataFormats/SiStripDetId/interface/SiStripDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
 
@@ -164,16 +161,14 @@ TrackTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       DetId hitId = hit->geographicalId();
       if(hitId.det() == DetId::Tracker) {
         if (hitId.subdetId() == StripSubdetector::TIB )  
-          edm::LogInfo("HitInfo") << " - TIB " << TIBDetId(hitId).layer();
+          edm::LogInfo("HitInfo") << " - TIB " << SiStripDetId(hitId);
         else if (hitId.subdetId() == StripSubdetector::TOB ) 
-          edm::LogInfo("HitInfo") << " - TOB " << TOBDetId(hitId).layer();
+          edm::LogInfo("HitInfo") << " - TOB " << SiStripDetId(hitId);
         else if (hitId.subdetId() == StripSubdetector::TEC ) 
-          edm::LogInfo("HitInfo") << " - TEC " << TECDetId(hitId).wheel();
+          edm::LogInfo("HitInfo") << " - TEC " << SiStripDetId(hitId);
         else if (hitId.subdetId() == StripSubdetector::TID ) 
-          edm::LogInfo("HitInfo") << " - TID " << TIDDetId(hitId).wheel();
-        else if (hitId.subdetId() == StripSubdetector::TID ) 
-          edm::LogInfo("HitInfo") << " - TID " << TIDDetId(hitId).wheel();
-        else if (hitId.subdetId() == (int) PixelSubdetector::PixelBarrel ) 
+          edm::LogInfo("HitInfo") << " - TID " << SiStripDetId(hitId);
+        else if (hitId.subdetId() == (int) PixelSubdetector::PixelBarrel )
           edm::LogInfo("HitInfo") << " - PixBar " << PXBDetId(hitId).layer();
         else if (hitId.subdetId() == (int) PixelSubdetector::PixelEndcap )
           edm::LogInfo("HitInfo") << " - PixFwd " << PXFDetId(hitId).disk();
