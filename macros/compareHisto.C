@@ -1,26 +1,15 @@
-#include <iostream.h>
-
-#include "TClass.h"
-#include "TPaveStats.h"
-#include "TObject.h"
-#include "TDirectory.h"
-#include "TKey.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TText.h"
-#include "TLegend.h"
-
 void compareHisto( Int_t fileMax = 4,
-                   TString file1 = "one.root", TString title1 = "run 202299 all",
-                   TString file2 = "two.root", TString title2 = "run 198603 all",
+                   TString file1 = "old.root", TString title1 = "standard",
+                   TString file2 = "new.root", TString title2 = "new",
                    TString file3 = "three.root", TString title3 = "MC std Summer12 PU",
                    TString file4 = "four.root", TString title4 = "MC inTime PU=45",
                    TString plotfile = "new.pdf",
-                   TString theDir = "ecalMinBiasAnalysis",
-                   TString theHisto = "vtx", 
+                   TString theDir = "DQMData/Run 1/MTD/Run summary/Vertices",
+                   TString theHisto = "TimeRes", 
                    bool printStat = true, TString drawOption = "E1", bool logX = false, bool logY = false, bool logZ = false, 
                    Double_t minX=0., Double_t maxX=0., Double_t minY=0., Double_t maxY=0., 
-                   bool Normalize = false, bool Scale = false, Double_t scale1 = 1., Double_t scale2 = 1., Double_t scale3 = 1., Double_t scale4 = 1.,
+                   bool Normalize = false, bool Scale = false, Double_t scale1 = 1., Double_t scale2 = 1., 
+                   Double_t scale3 = 1., Double_t scale4 = 1.,
                    bool ratio = false,bool fitratio = false,
                    TString legendP = "BR" ) 
 {
@@ -28,22 +17,24 @@ void compareHisto( Int_t fileMax = 4,
   if ( Normalize && Scale ) { std::cout << "Incompatible Normalize and Scale options!" << std::endl; return; } 
   
   gROOT ->Reset();
-  char*  filename1 = file1 ;
-  char*  filename2 = file2 ;
-  char*  filename3 = file3 ;
-  char*  filename4 = file4 ;
+  auto  filename1 = file1 ;
+  auto  filename2 = file2 ;
+  auto  filename3 = file3 ;
+  auto  filename4 = file4 ;
 
   
   TFile * rfile1 = new TFile(filename1);
   TFile * rfile2 = new TFile(filename2);
-  if ( fileMax > 2 ) { TFile * rfile3 = new TFile(filename3); } 
-  if ( fileMax > 3 ) { TFile * rfile4 = new TFile(filename4); }
+  TFile * rfile3;
+  TFile * rfile4;
+  if ( fileMax > 2 ) { rfile3 = new TFile(filename3); }
+  if ( fileMax > 3 ) { rfile4 = new TFile(filename4); }
   
-  char* baseDir=theDir;
+  auto baseDir=theDir;
   
   rfile1->cd(baseDir);
   rfile2->cd(baseDir);
-  if ( fileMax > 2 ) { rfile3->cd(baseDir); } 
+  if ( fileMax > 2 ) { rfile3->cd(baseDir); }
   if ( fileMax > 3 ) { rfile4->cd(baseDir); }
 
   int color1 = 1;
@@ -125,9 +116,10 @@ void compareHisto( Int_t fileMax = 4,
 
   if ( !ratio ) {
 
-    if ( myHisto1) { 
+    if ( myHisto1) {
+      TH1 * tcopy1;
       if ( Normalize ) { myHisto1->Sumw2(); (scale1 < 0.) ? (scala = std::fabs(scale1)) : (scala = myHisto1->Integral(-1,-2,"")/scale1) ; 
-        TH1 * tcopy1 = myHisto1->DrawNormalized(drawOption, scala); }
+        tcopy1 = myHisto1->DrawNormalized(drawOption, scala); }
       else if ( Scale) { myHisto1->Sumw2(); myHisto1->Scale(std::fabs(scale1),""); 
         if ( minX != maxX && myHisto1 ) {
           TAxis *xaxis = myHisto1->GetXaxis();
@@ -142,9 +134,10 @@ void compareHisto( Int_t fileMax = 4,
       else { myHisto1->Draw(drawOption); } 
       gPad->Update();
       if ( printStat ) {
+        TPaveStats *s;
         if ( !Normalize ) {
-          TPaveStats *s = (TPaveStats*)myHisto1->FindObject("stats"); }
-        else { TPaveStats *s = (TPaveStats*)tcopy1->FindObject("stats"); }
+          s = (TPaveStats*)myHisto1->FindObject("stats"); }
+        else { s = (TPaveStats*)tcopy1->FindObject("stats"); }
         Double_t y1 = 1.;
         Double_t y2 = 0.85;
         s->SetY1NDC(y1);
@@ -157,16 +150,18 @@ void compareHisto( Int_t fileMax = 4,
     
     TString ndrawOption = drawOption + "sames";
     
-    if ( myHisto2 ) { 
+    if ( myHisto2 ) {
+      TH1 * tcopy2;
       if ( Normalize ) { myHisto2->Sumw2(); (scale2 < 0.) ? (scala = std::fabs(scale2)) : (scala = myHisto2->Integral(-1,-2,"")/scale2) ; 
-        TH1 * tcopy2 = myHisto2->DrawNormalized(ndrawOption, scala); }
+        tcopy2 = myHisto2->DrawNormalized(ndrawOption, scala); }
       else if ( Scale) { myHisto2->Sumw2(); myHisto2->Scale(std::fabs(scale2),""); myHisto2->Draw(ndrawOption); } 
       else { myHisto2->Draw(ndrawOption); } 
       gPad->Update();
       if ( printStat ) {
+        TPaveStats *s;
         if ( !Normalize ) {
-          TPaveStats *s = (TPaveStats*)myHisto2->FindObject("stats"); }
-        else { TPaveStats *s = (TPaveStats*)tcopy2->FindObject("stats"); }
+          s = (TPaveStats*)myHisto2->FindObject("stats"); }
+        else { s = (TPaveStats*)tcopy2->FindObject("stats"); }
         Double_t y1 = 0.7;
         Double_t y2 = 0.85;
         s->SetY1NDC(y1);
@@ -177,45 +172,49 @@ void compareHisto( Int_t fileMax = 4,
       std::cout << "Null pointer!" << std::endl;
     }
     if ( fileMax > 2 ) {
-      if ( myHisto3 ) { 
-        if ( Normalize ) { myHisto3->Sumw2(); (scale3 < 0.) ? (scala = std::fabs(scale3)) : (scala = myHisto3->Integral(-1,-2,"")/scale3) ; 
-          TH1 * tcopy3 = myHisto3->DrawNormalized(ndrawOption, scala); }
-        else if ( Scale) { myHisto3->Sumw2(); myHisto3->Scale(std::fabs(scale3),""); myHisto3->Draw(ndrawOption); } 
-        else { myHisto3->Draw(ndrawOption); } 
-        gPad->Update();
-        if ( printStat ) {
-          if ( !Normalize ) {
-            TPaveStats *s = (TPaveStats*)myHisto3->FindObject("stats"); }
-          else { TPaveStats *s = (TPaveStats*)tcopy3->FindObject("stats"); }
-          Double_t y1 = 0.55;
-          Double_t y2 = 0.7;
-          s->SetY1NDC(y1);
-          s->SetY2NDC(y2);
-          s->SetTextColor(color3);
-        }
+      if ( myHisto3 ) {
+	TH1 * tcopy3;
+	if ( Normalize ) { myHisto3->Sumw2(); (scale3 < 0.) ? (scala = std::fabs(scale3)) : (scala = myHisto3->Integral(-1,-2,"")/scale3) ; 
+	  tcopy3 = myHisto3->DrawNormalized(ndrawOption, scala); }
+	else if ( Scale) { myHisto3->Sumw2(); myHisto3->Scale(std::fabs(scale3),""); myHisto3->Draw(ndrawOption); } 
+	else { myHisto3->Draw(ndrawOption); } 
+	gPad->Update();
+	if ( printStat ) {
+          TPaveStats *s;
+	  if ( !Normalize ) {
+	    s = (TPaveStats*)myHisto3->FindObject("stats"); }
+	  else { s = (TPaveStats*)tcopy3->FindObject("stats"); }
+	  Double_t y1 = 0.55;
+	  Double_t y2 = 0.7;
+	  s->SetY1NDC(y1);
+	  s->SetY2NDC(y2);
+	  s->SetTextColor(color3);
+	}
       } else {
-        std::cout << "Null pointer!" << std::endl;
+	std::cout << "Null pointer!" << std::endl;
       }
     }
     if ( fileMax > 3 ) {
-      if ( myHisto4 ) { 
-        if ( Normalize ) { myHisto4->Sumw2(); (scale4 < 0.) ? (scala = std::fabs(scale4)) : (scala = myHisto4->Integral(-1,-2,"")/scale4) ; 
-          TH1 * tcopy4 = myHisto4->DrawNormalized(ndrawOption, scala); }
-        else if ( Scale) { myHisto4->Sumw2(); myHisto4->Scale(std::fabs(scale4),""); myHisto4->Draw(ndrawOption); } 
-        else { myHisto4->Draw(ndrawOption); } 
-        gPad->Update();
-        if ( printStat ) {
-          if ( !Normalize ) {
-            TPaveStats *s = (TPaveStats*)myHisto4->FindObject("stats"); }
-          else { TPaveStats *s = (TPaveStats*)tcopy4->FindObject("stats"); } 
-          Double_t y1 = 0.4;
-          Double_t y2 = 0.55;
-          s->SetY1NDC(y1);
-          s->SetY2NDC(y2);
-          s->SetTextColor(color4);
-        }
+      if ( myHisto4 ) {
+        TH1 * tcopy4;
+	if ( Normalize ) { myHisto4->Sumw2(); (scale4 < 0.) ? (scala = std::fabs(scale4)) : (scala = myHisto4->Integral(-1,-2,"")/scale4) ; 
+	  tcopy4 = myHisto4->DrawNormalized(ndrawOption, scala); }
+	else if ( Scale) { myHisto4->Sumw2(); myHisto4->Scale(std::fabs(scale4),""); myHisto4->Draw(ndrawOption); } 
+	else { myHisto4->Draw(ndrawOption); } 
+	gPad->Update();
+	if ( printStat ) {
+          TPaveStats *s;
+	  if ( !Normalize ) {
+	    s = (TPaveStats*)myHisto4->FindObject("stats"); }
+	  else { s = (TPaveStats*)tcopy4->FindObject("stats"); } 
+	  Double_t y1 = 0.4;
+	  Double_t y2 = 0.55;
+	  s->SetY1NDC(y1);
+	  s->SetY2NDC(y2);
+	  s->SetTextColor(color4);
+	}
       } else {
-        std::cout << "Null pointer!" << std::endl;
+	std::cout << "Null pointer!" << std::endl;
       }
     }
     
@@ -253,58 +252,58 @@ void compareHisto( Int_t fileMax = 4,
     
     if ( fileMax > 2 ) {
       if ( myHisto3 ) { 
-        myHisto3->Sumw2();
-        TH1 * myRatio2 = myHisto1;
-        myRatio2->Divide(myRatio2,myHisto3,scale1,scale3," ");
+	myHisto3->Sumw2();
+	TH1 * myRatio2 = myHisto1;
+	myRatio2->Divide(myRatio2,myHisto3,scale1,scale3," ");
   
-        myRatio2->SetLineColor(color3);
-        myRatio2->SetMarkerStyle(marker3);
-        myRatio2->SetMarkerSize(markerSize);
-        myRatio2->SetMarkerColor(color3);
+	myRatio2->SetLineColor(color3);
+	myRatio2->SetMarkerStyle(marker3);
+	myRatio2->SetMarkerSize(markerSize);
+	myRatio2->SetMarkerColor(color3);
 
-        if ( minX != maxX ) {
-          TAxis *xaxis = myRatio2->GetXaxis();
-          xaxis->SetRangeUser(minX,maxX);
-        }
-        if ( minY != maxY ) {
-          TAxis *yaxis = myRatio2->GetYaxis();
-          yaxis->SetRangeUser(minY,maxY);
-        }
-        myRatio2->Draw(ndrawOption);
-        if ( fitratio ) {
-          myRatio2->Fit("pol1");
-          if (printStat) {
-            myRatio2->SetStats(kTRUE);
-            gStyle->SetOptFit(1); }
-        }
+	if ( minX != maxX ) {
+	  TAxis *xaxis = myRatio2->GetXaxis();
+	  xaxis->SetRangeUser(minX,maxX);
+	}
+	if ( minY != maxY ) {
+	  TAxis *yaxis = myRatio2->GetYaxis();
+	  yaxis->SetRangeUser(minY,maxY);
+	}
+	myRatio2->Draw(ndrawOption);
+	if ( fitratio ) {
+	  myRatio2->Fit("pol1");
+	  if (printStat) {
+	    myRatio2->SetStats(kTRUE);
+	    gStyle->SetOptFit(1); }
+	}
       }
     }
     if ( fileMax > 3 ) {
       if ( myHisto4 ) { 
-        myHisto4->Sumw2();
-        TH1 * myRatio3 = myHisto1;
-        myRatio3->Divide(myRatio3,myHisto4,scale1,scale4," ");
+	myHisto4->Sumw2();
+	TH1 * myRatio3 = myHisto1;
+	myRatio3->Divide(myRatio3,myHisto4,scale1,scale4," ");
   
-        myRatio3->SetLineColor(color4);
-        myRatio3->SetMarkerStyle(marker4);
-        myRatio3->SetMarkerSize(markerSize);
-        myRatio3->SetMarkerColor(color4);
+	myRatio3->SetLineColor(color4);
+	myRatio3->SetMarkerStyle(marker4);
+	myRatio3->SetMarkerSize(markerSize);
+	myRatio3->SetMarkerColor(color4);
 
-        if ( minX != maxX ) {
-          TAxis *xaxis = myRatio3->GetXaxis();
-          xaxis->SetRangeUser(minX,maxX);
-        }
-        if ( minY != maxY ) {
-          TAxis *yaxis = myRatio3->GetYaxis();
-          yaxis->SetRangeUser(minY,maxY);
-        }
-        myRatio3->Draw(ndrawOption);
-        if ( fitratio ) {
-          myRatio3->Fit("pol1");
-          if (printStat) {
-            myRatio3->SetStats(kTRUE);
-            gStyle->SetOptFit(1); }
-        }
+	if ( minX != maxX ) {
+	  TAxis *xaxis = myRatio3->GetXaxis();
+	  xaxis->SetRangeUser(minX,maxX);
+	}
+	if ( minY != maxY ) {
+	  TAxis *yaxis = myRatio3->GetYaxis();
+	  yaxis->SetRangeUser(minY,maxY);
+	}
+	myRatio3->Draw(ndrawOption);
+	if ( fitratio ) {
+	  myRatio3->Fit("pol1");
+	  if (printStat) {
+	    myRatio3->SetStats(kTRUE);
+	    gStyle->SetOptFit(1); }
+	}
       }
     }
 
@@ -346,7 +345,7 @@ void compareHisto( Int_t fileMax = 4,
   if ( fileMax > 3 ) { leg->AddEntry(myHisto4,title4,"P"); }
   leg->Draw();
   
-  histoPlot->SaveAs(plotfile);
+  myCanvas->SaveAs(plotfile);
 
   return;
   

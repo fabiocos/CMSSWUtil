@@ -1,17 +1,15 @@
-#include "TClass.h"
-
-std::vector<TString> navigate( TString currentfile = "new.root",
-                               TString theDir = "DQMData/Run 1/Generator/Run summary/MBUEandQCD" )
+std::vector<TString> navigateROOTFile( TString currentfile = "new.root",
+                                       TString theDir = "DQMData/Run 1/MTD/Run summary/Vertices" )
 {
 
  gROOT ->Reset();
- char*  sfilename = currentfile ;
+ auto sfilename = currentfile ;
 
  delete gROOT->GetListOfFiles()->FindObject(sfilename);
 
  TFile * sfile = new TFile(sfilename);
 
- char* baseDir=theDir;
+ auto baseDir=theDir;
 
  sfile->cd(baseDir);
  gDirectory->ls();
@@ -23,6 +21,7 @@ std::vector<TString> navigate( TString currentfile = "new.root",
 
  TIter i( d->GetListOfKeys() );
  TKey *k;
+ std::cout << "Looping... " << std::endl;
  while( (k = (TKey*)i())) {
    TClass * c1 = gROOT->GetClass(k->GetClassName());
    std::cout << k->GetName() << " " << k->GetClassName() << std::endl;
@@ -31,9 +30,10 @@ std::vector<TString> navigate( TString currentfile = "new.root",
    theHistList.push_back(k->GetName());
 
  }
- 
+
  for (unsigned int index = 0; index < theHistList.size() ; index++ ) {
    std::cout << index << " " << theHistList[index] << std::endl;
  }
 
+ return theHistList;
 }
