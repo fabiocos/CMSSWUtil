@@ -1,19 +1,17 @@
-#include "TClass.h"
-
-void plotHisto( TString inputfile = "DQM_V0001_R000000001__ConverterTester__Test__RECO.root",
-                TString plotfile = "new.jpg",
-                TString theDir = "DQMData/Run\ 1/HcalRecHitsV/Run\ summary/HcalRecHitTask", 
-                TString theHisto = "HcalRecHitTask_energy_of_rechits_HF",
+void plotHisto( TString inputfile = "old.root",
+                TString plotfile = "old.jpg",
+                TString theDir = "DQMData/Run 1/MTD/Run summary/Vertices", 
+                TString theHisto = "TimeRes",
                 bool printStat = true, TString drawOption = "", bool logX = false, bool logY = false, bool logZ = false, 
                 Double_t minX=0., Double_t maxX=0.)
 {
 
  gROOT ->Reset();
- char*  sfilename = inputfile;
+ auto sfilename = inputfile;
 
  TFile * sfile = new TFile(sfilename);
 
- char* baseDir=theDir;
+ auto baseDir=theDir;
 
  sfile->cd(baseDir);
  gDirectory->ls();
@@ -42,9 +40,9 @@ void plotHisto( TString inputfile = "DQM_V0001_R000000001__ConverterTester__Test
    myHisto->Draw(drawOption);
  } else {
    std::cout << "Null pointer!" << std::endl;
- } 
+ }
 
- histoPlot->SaveAs(plotfile);
+ showShape->SaveAs(plotfile);
 
  return;
 
