@@ -79,4 +79,3 @@ echo "Output ready with log_${process}_${seed}.txt and ${file}_final.lhe at `pwd
 echo "End of job on " `date`
 exit 0;
 
-
